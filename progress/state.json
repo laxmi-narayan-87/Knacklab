@@ -1,0 +1,15 @@
+{
+  "bootcamp": {
+    "pretest": {
+      "self_rating": "ok",
+      "environment": "Windows PowerShell",
+      "readiness_vs_health": "strong",
+      "security_redirect_abuse": "strong",
+      "incident_triage_500": "strong",
+      "idempotency_background_jobs": "strong",
+      "indexing_mechanics": "strong",
+      "testing_tradeoffs": "unit_heavy",
+      "overall_assessment": "strong conceptual baseline; accelerate pacing, introduce realistic production constraints, and apply deeper break-phase debugging"
+    }
+  }
+}
