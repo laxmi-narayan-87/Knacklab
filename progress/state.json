@@ -1,5 +1,6 @@
 {
   "bootcamp": {
+    "product_scenario": "public_consumer",
     "pretest": {
       "self_rating": "ok",
       "environment": "Windows PowerShell",
