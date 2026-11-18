@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from app.config import settings
 from app.routers.links import router as links_router
@@ -15,10 +16,10 @@ app = FastAPI(
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
-        content={
+        content=jsonable_encoder({
             "detail": exc.errors(),
             "message": "Validation failed: invalid request payload or malformed URL"
-        }
+        })
     )
 
 @app.get("/health")
