@@ -26,9 +26,13 @@ class LinkCreate(BaseModel):
             parsed = urlparse(cleaned)
         except Exception as e:
             raise ValueError(f"Malformed URL: {e}")
-        # Broaden schemes for custom deep-linking protocols
-        if not parsed.scheme:
-            raise ValueError("URL must include a scheme")
+        scheme = parsed.scheme.lower()
+        if scheme not in ("http", "https"):
+            raise ValueError(f"Scheme '{parsed.scheme}' not allowed. Only http and https are permitted.")
+        if "@" in parsed.netloc or parsed.username or parsed.password:
+            raise ValueError("Userinfo (@) is not allowed in URLs")
+        if not parsed.netloc or not parsed.hostname:
+            raise ValueError("URL must have a valid hostname and network location")
         return cleaned
 
     @field_validator("expires_at")

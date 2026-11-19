@@ -29,6 +29,13 @@ def redirect_to_long_url(code: str, request: Request, db: Session = Depends(get_
         if expires <= now:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Link not found")
 
+    # Defense-in-depth: verify that destination URL uses an allowed scheme
+    from urllib.parse import urlparse
+    dest_parsed = urlparse(link.long_url)
+    if dest_parsed.scheme.lower() not in ("http", "https"):
+        logger.warning(f"Unsafe redirect scheme blocked for code {code}: {link.long_url}")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Link not found")
+
     # Record click event asynchronously or safely without blocking redirect
     try:
         client_ip = request.client.host if request.client else "unknown"
