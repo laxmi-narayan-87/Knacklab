@@ -16,20 +16,37 @@
       "status": "completed",
       "layout_decision": "single_app",
       "runtime": "fastapi",
+      "score": "10/10",
       "completed_steps": ["pretest", "scenario_pick", "context", "decide", "build", "verify", "break", "fix", "reflect"],
       "verification_proof": "GET /health returned HTTP 200 {'ok': true}"
     },
     "module_02": {
-      "status": "reflect",
+      "status": "completed",
       "database_decision": "postgres",
+      "score": "10/10",
       "models": ["Link", "ClickEvent"],
       "indexes": [
         "ix_links_code (unique)",
         "ix_links_created_by",
         "ix_click_events_link_id_clicked_at (composite)"
       ],
-      "completed_steps": ["context", "decide", "build", "verify", "break", "fix"],
+      "completed_steps": ["context", "decide", "build", "verify", "break", "fix", "reflect"],
       "verification_proof": "Executed module-02-seed-query.py; inserted and queried sdf-launchpad-02 matching https://www.upsk.to/laxmi-narayan-87"
+    },
+    "module_03": {
+      "status": "completed",
+      "routing_decision": "prefix_r",
+      "score": "10/10",
+      "routes": ["POST /links", "GET /links", "GET /links/{id}", "GET /r/{code}"],
+      "completed_steps": ["context", "decide", "build", "verify", "break", "fix", "reflect"],
+      "verification_proof": "curl verification + test_validation_regression.py (12/12) + test_redirect_defense.py; 307 redirects, 404 on missing, 400 on abuse"
+    },
+    "pack": {
+      "slug": "launchpad",
+      "status": "completed",
+      "modules_completed": 3,
+      "total_modules": 3,
+      "overall_dimension_score": "5.0 / 5.0"
     }
   }
 }
