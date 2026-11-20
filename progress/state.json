@@ -23,8 +23,14 @@
       "instructor_calibration": "High security and verification discipline. Push towards complex architecture decomposition, prompt engineering for system contracts, and parallel agent orchestration."
     },
     "module_01": {
-      "status": "scenario_confirmed",
-      "scenario": "team-collaboration"
+      "status": "completed",
+      "score": "10/10",
+      "completed_steps": ["pretest", "scenario_pick", "context", "decide", "build", "verify", "break", "fix", "reflect"],
+      "artifacts": ["architecture-summary.md", "trust-audit.md"]
+    },
+    "module_02": {
+      "status": "in_progress",
+      "step": "context"
     }
   }
 }
