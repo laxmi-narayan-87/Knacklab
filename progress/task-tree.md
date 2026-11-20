@@ -86,39 +86,109 @@ Task 1: Data Contracts (Models & Store)
 
 ---
 
-## 3. Full Prompt Specifications (First 3 Sequential Tasks)
+## 3. Formal Interface Contracts
 
-### Task 1 Prompt: Invitation & Audit Data Contracts
+### Task 1 → Task 2 Interface Contract
+
+#### Upstream (Task 1) Guarantees
+`src/models/store.js` exports:
+- `users`: User[]
+- `teams`: Team[]
+- `memberships`: Membership[]
+- `invitations`: Invitation[]
+- `auditEvents`: AuditEvent[]
+- `TEAM_ROLES`: Object with exact values `{ OWNER: "Owner", ADMIN: "Admin", MEMBER: "Member", GUEST: "Guest" }`
+- `getTeamMembership(userId, teamId) -> Membership | null`
+- `addMembership({ userId, teamId, role }) -> Membership | null`
+
+#### Record Shapes
+```typescript
+interface Membership {
+  id: string;
+  userId: string;
+  teamId: string;
+  role: "Owner" | "Admin" | "Member" | "Guest";
+  createdAt: string; // ISO 8601
+}
+
+interface Invitation {
+  id: string;
+  teamId: string;
+  invitedEmail: string;
+  role: "Owner" | "Admin" | "Member" | "Guest";
+  tokenDigest: string; // SHA-256 hex digest
+  expiresAt: string;
+  usedAt: string | null;
+  createdAt: string;
+}
+
+interface AuditEvent {
+  id: string;
+  actorId: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  occurredAt: string;
+  ipHash: string;
+  stateDelta: Record<string, unknown>;
+}
+```
+
+#### Downstream (Task 2) Consumption Rules
+- `src/services/authz.js` imports `TEAM_ROLES` and `getTeamMembership`.
+- Calls `getTeamMembership(userId, teamId)`.
+- Evaluates `membership.role` against `TEAM_ROLES`.
+- Returns `null` on missing membership (treated strictly as unauthenticated / forbidden).
+- Never mutates or directly iterates the `memberships` array.
+
+#### Shared Invariants
+- Exact role string casing: `"Owner"`, `"Admin"`, `"Member"`, `"Guest"`.
+- Missing records always return `null`, never throw exceptions or return undefined.
+- In-memory updates maintain referential integrity.
+
+---
+
+## 4. Full Prompt Specifications (First 3 Sequential Tasks)
+
+### Task 1 Prompt (Revised): Invitation, Membership & Audit Data Contracts
 ```markdown
-Inspect the existing workspace before editing. Read only the files needed to understand the current data structures and conventions, especially src/models/store.js, src/services/workspace.js, src/routes/index.js, and tests/starter.test.js.
+Inspect src/models/store.js, src/services/workspace.js, src/routes/index.js, and tests/starter.test.js before editing.
 
-Implement the smallest possible data-layer change for Team Collaboration invitations and audit events.
+Extend the in-memory data layer for Team Collaboration. Preserve the existing users and teams collections and add:
+- memberships
+- invitations
+- auditEvents
 
-Invitation records must support:
-- team ID
-- invited email
-- requested role
-- token digest, never the raw token
-- expiration time
-- used state
-- creation and acceptance timestamps
+Export the exact role constants (TEAM_ROLES):
+- Owner
+- Admin
+- Member
+- Guest
 
-Audit records must support:
-- actor ID
-- action name
-- target type and target ID
-- timestamp
-- IP address or the project’s approved privacy-preserving representation
-- state delta
+Export these exact helper functions:
+- getTeamMembership(userId, teamId) -> Membership | null
+- addMembership({ userId, teamId, role }) -> Membership | null
 
-Follow the existing in-memory store pattern. Do not redesign unrelated models, routes, or services. Do not add external packages. Do not implement HTTP routes, token generation, authentication, or audit endpoints in this task.
+Record shapes required:
+- Membership: id, userId, teamId, role ("Owner"|"Admin"|"Member"|"Guest"), createdAt (ISO string)
+- Invitation: id, teamId, invitedEmail, role, tokenDigest, expiresAt, usedAt, createdAt
+- AuditEvent: id, actorId, action, targetType, targetId, occurredAt, ipHash, stateDelta (structured object)
+
+Behavioral rules:
+- getTeamMembership() returns the matching record or null if not found.
+- addMembership() creates and returns the new membership; returns null for an invalid role or duplicate (userId, teamId) pair.
+- Follow the existing in-memory store pattern. Do not redesign unrelated models. Do not add external packages or HTTP routes.
 
 Acceptance criteria:
-1. A runtime test can create and retrieve an invitation.
-2. A runtime test can mark an invitation as used.
-3. A runtime test can append and retrieve an audit event.
-4. Existing starter tests still pass.
-5. Keep the change below 150 lines.
+1. memberships is exported from src/models/store.js.
+2. All four role values are exported as TEAM_ROLES.
+3. addMembership() creates a valid membership with an auto-generated id and createdAt.
+4. getTeamMembership() returns the membership for matching userId and teamId.
+5. getTeamMembership() returns null when no membership exists.
+6. Duplicate memberships for the same (userId, teamId) are rejected (returns null).
+7. Invalid role strings are rejected (returns null).
+8. Existing tests in tests/starter.test.js still pass without error.
+9. Total line changes remain strictly below 150 lines.
 ```
 
 ### Task 2 Prompt: Team-Role Authorization Helpers (RBAC)
