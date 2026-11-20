@@ -1,8 +1,13 @@
 import crypto from "node:crypto";
+import { DomainError, ERROR_CODES } from "./errors.js";
 
 export function digestInvitationToken(rawToken) {
   if (!rawToken || typeof rawToken !== "string") {
-    throw new Error("Invalid raw token provided");
+    throw new DomainError(
+      ERROR_CODES.INVALID_REQUEST,
+      "Invalid raw token provided",
+      400
+    );
   }
   return crypto.createHash("sha256").update(rawToken).digest("hex");
 }

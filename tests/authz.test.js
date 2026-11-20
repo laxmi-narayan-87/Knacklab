@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { addMembership, TEAM_ROLES } from "../src/models/store.js";
 import { canUserInvite, requireTeamRole } from "../src/services/authz.js";
+import { isDomainError } from "../src/services/errors.js";
 
 const TEAM_A = "team-alpha";
 const USER_OWNER = "user-owner";
@@ -10,7 +11,6 @@ const USER_MEMBER = "user-member";
 const USER_GUEST = "user-guest";
 const USER_OUTSIDER = "user-outsider";
 
-// Seed test memberships
 addMembership({ userId: USER_OWNER, teamId: TEAM_A, role: TEAM_ROLES.OWNER });
 addMembership({ userId: USER_ADMIN, teamId: TEAM_A, role: TEAM_ROLES.ADMIN });
 addMembership({ userId: USER_MEMBER, teamId: TEAM_A, role: TEAM_ROLES.MEMBER });
@@ -35,14 +35,37 @@ test("requireTeamRole succeeds when role is authorized", () => {
   assert.equal(member.role, TEAM_ROLES.ADMIN);
 });
 
-test("requireTeamRole throws when unauthorized or missing", () => {
-  assert.throws(
-    () => requireTeamRole(USER_MEMBER, TEAM_A, [TEAM_ROLES.OWNER, TEAM_ROLES.ADMIN]),
-    /not permitted/
-  );
+test("requireTeamRole throws structured DomainError on unauthorized or missing membership", () => {
+  try {
+    requireTeamRole(USER_MEMBER, TEAM_A, [TEAM_ROLES.OWNER, TEAM_ROLES.ADMIN]);
+    assert.fail("Should have thrown");
+  } catch (err) {
+    assert.ok(isDomainError(err));
+    assert.equal(err.code, "forbidden");
+    assert.equal(err.statusCode, 403);
+    assert.deepEqual(err.toJSON(), {
+      error: {
+        code: "forbidden",
+        message: "Role Member is not permitted for this action",
+      },
+    });
+  }
 
-  assert.throws(
-    () => requireTeamRole(USER_OUTSIDER, TEAM_A, [TEAM_ROLES.OWNER]),
-    /does not belong/
-  );
+  try {
+    requireTeamRole(USER_OUTSIDER, TEAM_A, [TEAM_ROLES.OWNER]);
+    assert.fail("Should have thrown");
+  } catch (err) {
+    assert.ok(isDomainError(err));
+    assert.equal(err.code, "forbidden");
+    assert.equal(err.statusCode, 403);
+  }
+
+  try {
+    requireTeamRole(null, TEAM_A, [TEAM_ROLES.OWNER]);
+    assert.fail("Should have thrown");
+  } catch (err) {
+    assert.ok(isDomainError(err));
+    assert.equal(err.code, "unauthorized");
+    assert.equal(err.statusCode, 401);
+  }
 });

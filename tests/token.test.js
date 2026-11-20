@@ -5,6 +5,7 @@ import {
   digestInvitationToken,
   verifyInvitationToken,
 } from "../src/services/token.js";
+import { isDomainError } from "../src/services/errors.js";
 
 test("generateInvitationToken returns unique rawToken and hex digest", () => {
   const token1 = generateInvitationToken();
@@ -12,8 +13,8 @@ test("generateInvitationToken returns unique rawToken and hex digest", () => {
 
   assert.ok(token1.rawToken);
   assert.ok(token1.tokenDigest);
-  assert.equal(token1.rawToken.length, 64); // 32 bytes hex
-  assert.equal(token1.tokenDigest.length, 64); // SHA-256 hex
+  assert.equal(token1.rawToken.length, 64);
+  assert.equal(token1.tokenDigest.length, 64);
   assert.notEqual(token1.rawToken, token2.rawToken);
   assert.notEqual(token1.tokenDigest, token2.tokenDigest);
 });
@@ -25,6 +26,17 @@ test("digestInvitationToken produces deterministic SHA-256 hex digest", () => {
 
   assert.equal(digestA, digestB);
   assert.equal(digestA.length, 64);
+});
+
+test("digestInvitationToken throws DomainError on malformed input", () => {
+  try {
+    digestInvitationToken("");
+    assert.fail("Should have thrown");
+  } catch (err) {
+    assert.ok(isDomainError(err));
+    assert.equal(err.code, "invalid_request");
+    assert.equal(err.statusCode, 400);
+  }
 });
 
 test("verifyInvitationToken confirms matching digest with timing safety", () => {

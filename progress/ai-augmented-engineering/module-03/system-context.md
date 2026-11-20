@@ -27,8 +27,15 @@ All endpoint errors must strictly conform to this JSON schema:
 }
 ```
 
+### Shared Domain Error Utility (`src/services/errors.js`):
+Services throw `DomainError` from `src/services/errors.js` rather than bare `new Error()`.
+- `new DomainError(code, message, statusCode)`
+- `isDomainError(err) -> boolean`
+- `err.toJSON() -> { error: { code, message } }`
+- Standard codes: `ERROR_CODES.INVALID_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `RESOURCE_NOT_FOUND`, `INTERNAL_ERROR`.
+
 ### HTTP Status Code Mapping:
-* `400 Bad Request` (`code: "invalid_request"` | `"validation_error"`): Malformed input, missing fields, invalid role strings, or expired tokens.
+* `400 Bad Request` (`code: "invalid_request"`): Malformed input, missing fields, invalid role strings, or expired tokens.
 * `401 Unauthorized` (`code: "unauthorized"`): Missing or invalid authentication credentials.
 * `403 Forbidden` (`code: "forbidden"`): Authenticated user lacks required team privileges (e.g., Member/Guest attempting an invitation).
 * `404 Not Found` (`code: "resource_not_found"`): Missing team, missing user, or unknown token (where token existence should not be disclosed).
