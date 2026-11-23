@@ -63,15 +63,12 @@
             "isolation of dependencies"
           ],
           "teaching_approaches": [
-            "socratic-tutor",
-            "analogy-driven",
-            "evidence-grounded"
+            "analogy",
+            "guided_discovery"
           ],
-          "effective_level": "advanced",
+          "effective_level": "intermediate",
           "learning_style_signals": [
-            "systematic",
-            "hypothesis-driven",
-            "rigorous-verification"
+            "visual_walkthrough"
           ],
           "confidence_level": "high"
         },
