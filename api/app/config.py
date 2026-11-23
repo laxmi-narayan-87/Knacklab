@@ -7,6 +7,7 @@ class Settings(BaseSettings):
 
     port: int = Field(default=3000)
     database_url: str = Field(..., validation_alias="DATABASE_URL")
+    log_level: str = Field(default="INFO", validation_alias="LOG_LEVEL")
     redis_url: str | None = None
     jwt_secret: str | None = None
     api_key_a: str | None = None
