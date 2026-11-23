@@ -54,12 +54,13 @@ def create_link(payload: LinkCreate, request: Request, db: Session = Depends(get
 
 @router.get("", response_model=List[LinkResponse])
 def list_links(
-    limit: int = Query(20, ge=1, le=100),
-    offset: int = Query(0, ge=0),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     request: Request = None,
     db: Session = Depends(get_db)
 ):
-    links = db.query(Link).order_by(Link.created_at.desc()).offset(offset).limit(limit).all()
+    offset = (page - 1) * limit
+    links = db.query(Link).order_by(Link.id.asc()).offset(offset).limit(limit).all()
     return [
         LinkResponse(
             id=link.id,
