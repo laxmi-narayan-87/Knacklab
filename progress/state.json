@@ -11,26 +11,31 @@
     "bootcamp": {
       "product_scenario": "team-collaboration"
     },
+    "status": "completed",
+    "modules_completed": 3,
+    "total_modules": 3,
+    "overall_score": "30/30",
+    "pack": "launchpad"
+  },
+  "debugging_incident_response": {
+    "bootcamp": {
+      "product_scenario": "linkops"
+    },
     "pretest": {
-      "self_rating": "ok",
-      "tool_and_mode": "Antigravity IDE in Agent Mode",
+      "self_rating": "new",
       "os_and_shell": "Windows (PowerShell)",
-      "review_mindset": "strong — reject unvalidated code, move secrets to environment, require independent verification",
-      "trust_calibration": "strong — avoid using AI for decisions that cannot be independently understood and verified",
-      "decomposition_strategy": "give useful context upfront, review in sections against requirements and edge cases",
-      "selection_criteria": "compare against requirements, security, maintainability, tests, and simplicity",
-      "risk_awareness": "unreviewed code introducing hidden logic, security, or reliability vulnerabilities in production",
-      "instructor_calibration": "High security and verification discipline. Push towards complex architecture decomposition, prompt engineering for system contracts, and parallel agent orchestration."
-    },
-    "module_01": {
-      "status": "completed",
-      "score": "10/10",
-      "completed_steps": ["pretest", "scenario_pick", "context", "decide", "build", "verify", "break", "fix", "reflect"],
-      "artifacts": ["architecture-summary.md", "trust-audit.md"]
-    },
-    "module_02": {
-      "status": "in_progress",
-      "step": "context"
+      "tools_verified": [
+        "Node.js v22.19.0",
+        "Python 3.13.7",
+        "Docker 29.9.3",
+        "curl 8.22.0",
+        "Git 2.52.0"
+      ],
+      "triage_instinct": "strong — scope, RED metrics, deployments, dependencies",
+      "root_cause_concept": "demonstrated — symptom vs underlying condition",
+      "production_divergence": "demonstrated — config/secrets/environment drift and traffic/scale differences",
+      "incident_prioritization": "demonstrated — check recent deployments and mitigate before code debugging",
+      "causality_instinct": "demonstrated — what changed between working and broken state"
     }
   }
 }
