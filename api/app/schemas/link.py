@@ -40,9 +40,10 @@ class LinkCreate(BaseModel):
     def validate_expires_at(cls, v: Optional[datetime]) -> Optional[datetime]:
         if v is not None:
             now = datetime.now(timezone.utc)
-            cmp_v = v if v.tzinfo else v.replace(tzinfo=timezone.utc)
+            cmp_v = v.astimezone(timezone.utc) if v.tzinfo else v.replace(tzinfo=timezone.utc)
             if cmp_v <= now:
                 raise ValueError("expires_at must be in the future")
+            return cmp_v
         return v
 
     @field_validator("tags")

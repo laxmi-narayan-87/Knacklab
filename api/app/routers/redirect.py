@@ -40,7 +40,7 @@ def redirect_to_long_url(code: str, request: Request, db: Session = Depends(get_
 
     if link.expires_at:
         now = datetime.now(timezone.utc)
-        expires = link.expires_at if link.expires_at.tzinfo else link.expires_at.replace(tzinfo=timezone.utc)
+        expires = link.expires_at.astimezone(timezone.utc) if link.expires_at.tzinfo else link.expires_at.replace(tzinfo=timezone.utc)
         if expires <= now:
             emit_event("warn", "link expired", req_id, code=code, expires_at=expires.isoformat())
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Link not found")
